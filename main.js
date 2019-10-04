@@ -34,12 +34,13 @@ function setup() {
             random(CANVAS_WIDTH),
             random(CANVAS_HEIGHT)
         )});
-            
+    }, 1000);
+    setInterval( _ => {
         poison.push({position: createVector(
             random(CANVAS_WIDTH),
             random(CANVAS_HEIGHT)
         )});
-    }, 1000);
+    }, 5000);
 }
 
 function draw() {     
