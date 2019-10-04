@@ -1,7 +1,9 @@
 const CANVAS_WIDTH = 1200, CANVAS_HEIGHT = 550;
-const POP_SIZE = 10, INITIAL_FOODS = 50, INITIAL_POISONS = 50;
+const POP_SIZE = 10, INITIAL_FOODS = 50, INITIAL_POISONS = 5;
 
-let population = [], dead = [], food = [], poison = [];
+let food = [], poison = [];
+
+let individuals;
 
 function isInsideCircle(point, pos, radius) {
 	return pow(point.x - pos.x, 2) + pow(point.y - pos.y, 2) < pow(radius, 2);
@@ -12,10 +14,9 @@ function setup() {
 	let canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 	canvas.parent("canvasDiv");
 
-	background(0);
+	individuals = new Population();
 
-	for (let i = 0; i < POP_SIZE; i++) 
-		population.push(new Specimen());
+	background(0);
 
 	for (let i = 0; i < INITIAL_FOODS; i++)
 		food.push({
@@ -44,7 +45,7 @@ function setup() {
 			),
 			radius: 4
 		});
-	}, 1000);
+	}, 500);
 
 	// Cria um veneno novo a cada intervalo
 	setInterval(_ => {
@@ -55,18 +56,21 @@ function setup() {
 			),
 			radius: 4
 		});
-	}, 5000);
+	}, 500);
 
 	// Diminui o raio de todos 
 	setInterval(_ => {
-		for (let coiso of population) {
+		for (let coiso of individuals.population) {
 			if (coiso.radius < 4)
 				coiso.die();
-
-			coiso.radius -= 0.5;
-			coiso.fitness += 1;
+	
+			coiso.radius -= 0.05;
+			coiso.fitness += 1 + coiso.radius;
 		}
 	}, 1000);
+
+	// Genocidio
+	setInterval(_ => individuals.genocide(), 30000);
 }
 
 function draw() {
@@ -84,9 +88,38 @@ function draw() {
 		circle(j.position.x, j.position.y, 2 * j.radius);
 	}
 
-	for (let coiso of population) {
-		coiso.draw();
-		coiso.move();
-		coiso.behavior();
-	}
+	if (individuals.population.length) {
+		for (let coiso of individuals.population) {
+			coiso.draw();
+			coiso.move();
+			coiso.behavior();
+		}
+	} else {
+		individuals.naturalSelection();
+		individuals.generate();	
+
+		console.log(`Generation: ${individuals.generation}`);
+		
+		background(0);
+
+		food = [];
+		for (let i = 0; i < INITIAL_FOODS; i++)
+			food.push({
+				position: createVector(
+					random(CANVAS_WIDTH), 
+					random(CANVAS_HEIGHT)
+				),
+				radius: 4
+			});
+		
+		poison = [];
+		for (let i = 0; i < INITIAL_POISONS; i++)
+			poison.push({
+				position: createVector(
+					random(CANVAS_WIDTH), 
+					random(CANVAS_HEIGHT)
+				),
+				radius: 4
+			})
+	}	
 }
