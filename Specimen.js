@@ -1,6 +1,6 @@
 class Specimen {
   	constructor() {
-		this.radius = int(random(9, 15));
+		this.radius = 10;
 
 		this.position = createVector(
 			int(random(CANVAS_WIDTH)),
@@ -14,12 +14,6 @@ class Specimen {
 
 		this.acceleration = createVector(0, 0);
 
-		this.color = [
-			int(random(10, 255)),
-			int(random(10, 255)),
-			int(random(10, 255))
-		];
-
 		this.dna = {
 			foodWeight: random(-1, 1),
 			poisonWeight: random(-1, 1),
@@ -32,6 +26,14 @@ class Specimen {
 		this.maxSpeed = 5;
 		this.maxForce = 0.5;
 		this.fitness = 0;
+
+		// Define a cor de acordo com as caracteristicas
+		if (this.dna.foodWeight > this.dna.poisonWeight && this.dna.foodWeight > this.dna.enemyWeight)
+			this.color = [66, 245, 114];
+		else if (this.dna.poisonWeight > this.dna.foodWeight && this.dna.poisonWeight > this.dna.enemyWeight)
+			this.color = [245, 87, 66];
+		else if (this.dna.enemyWeight > this.dna.foodWeight && this.dna.enemyWeight > this.dna.poisonWeight)
+			this.color = [66, 188, 245];
   }
 
 	draw() {					
@@ -149,8 +151,8 @@ class Specimen {
 
 	die() {
 		// Remove da população quando for muito pequeno e tentar comer veneno
-		dead.push(this);
-		population.splice(population.indexOf(this), 1);
+		individuals.dead.push(this);
+		individuals.population.splice(individuals.population.indexOf(this), 1);
 	}
 
 	seek(target) {
@@ -166,7 +168,7 @@ class Specimen {
 
 	seekEnemy() {
 		let closest = null;
-		for (let i of population) {
+		for (let i of individuals.population) {
 			// Se os raios são iguais nada deve ser feito
 			if (i.position.equals(this.position) && i.radius == this.radius) 
 				continue;
@@ -176,20 +178,18 @@ class Specimen {
 					closest = i;
 					if (this.position.dist(i.position) < this.radius) {
 						if (i.radius > this.radius) {
-							// population.splice(population.indexOf(this), 1);
-							this.die();
-
 							let increment = sqrt(pow(i.radius, 2) + pow(this.radius, 2)) - i.radius;				
 							i.radius += increment;
 							i.visionRadius += 1.2 * increment;
 
-						} else {
-							// population.splice(population.indexOf(i), 1);
-							i.die();
+							this.die();
 
+						} else {
 							let increment = sqrt(pow(i.radius, 2) + pow(this.radius, 2)) - this.radius;				
 							this.radius += increment;
 							this.visionRadius += 1.2 * increment;
+
+							i.die();
 						}
 					}
 				}
@@ -203,5 +203,63 @@ class Specimen {
 			return this.seek(closest.position);
 		else 
 			return createVector(0, 0); 
+	}
+
+	// Muda aleatoriamente uma caracteristica
+	mutate(mutationRate) {
+		if (random(1) < mutationRate) 
+			this.dna.accelerationWeight = random(0.5, 1);
+
+		if (random(1) < mutationRate) 
+			this.dna.enemyWeight = random(-1, 1);
+		
+		if (random(1) < mutationRate) 
+			this.dna.poisonWeight = random(-1, 1);
+		
+		if (random(1) < mutationRate) 
+			this.dna.foodWeight = random(-1, 1);
+
+		if (random(1) < mutationRate) 
+			this.dna.visionWeight = random(1, 2);
+		
+		// Atualiza a cor
+		if (this.dna.foodWeight > this.dna.poisonWeight && this.dna.foodWeight > this.dna.enemyWeight)
+			this.color = [66, 245, 114];
+		else if (this.dna.poisonWeight > this.dna.foodWeight && this.dna.poisonWeight > this.dna.enemyWeight)
+			this.color = [245, 87, 66];
+		else if (this.dna.enemyWeight > this.dna.foodWeight && this.dna.enemyWeight > this.dna.poisonWeight)
+			this.color = [66, 188, 245];
+	}	
+
+	// Gera um novo individuo com 50% de herdar cada caracteristica
+	crossover(partner) {
+		let child = new Specimen();
+
+		if (random(1) < 0.5) 
+			child.dna.accelerationWeight = this.dna.accelerationWeight;
+		else 
+			child.dna.accelerationWeight = partner.dna.accelerationWeight;
+
+		if (random(1) < 0.5) 
+			child.dna.enemyWeight = this.dna.enemyWeight;
+		else 
+			child.dna.enemyWeight = partner.dna.enemyWeight;
+		
+		if (random(1) < 0.5) 
+			child.dna.poisonWeight = this.dna.poisonWeight;
+		else 
+			child.dna.poisonWeight = partner.dna.poisonWeight;
+		
+		if (random(1) < 0.5) 
+			child.dna.foodWeight = this.dna.foodWeight;
+		else 
+			child.dna.foodWeight = partner.dna.foodWeight;
+
+		if (random(1) < 0.5) 
+			child.dna.visionWeight = this.dna.visionWeight;
+		else 
+			child.dna.visionWeight = partner.dna.visionWeight;
+
+		return child;
 	}
 }
