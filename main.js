@@ -1,70 +1,92 @@
 const CANVAS_WIDTH = 1200, CANVAS_HEIGHT = 550;
-const POP_SIZE = 5, INITIAL_FOODS = 50, INITIAL_POISONS = 50;
+const POP_SIZE = 10, INITIAL_FOODS = 50, INITIAL_POISONS = 50;
 
-let population = [], food = [], poison = [];
+let population = [], dead = [], food = [], poison = [];
 
 function isInsideCircle(point, pos, radius) {
-    return pow((point.x - pos.x), 2) + pow((point.y - pos.y), 2) < pow(radius, 2)
+	return pow(point.x - pos.x, 2) + pow(point.y - pos.y, 2) < pow(radius, 2);
 }
 
 function setup() {
-    frameRate(60);
-    let canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
-    canvas.parent("canvasDiv");
-    
-    background(0);
-    
-    for(let i = 0; i < POP_SIZE; i++) 
-        population.push(new Specimen());
+	frameRate(60);
+	let canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+	canvas.parent("canvasDiv");
 
-    for(let i = 0; i < INITIAL_FOODS; i++)
-        food.push({position: createVector(
-            random(CANVAS_WIDTH),
-            random(CANVAS_HEIGHT)
-        )});
+	background(0);
 
-    for(let i = 0; i < INITIAL_POISONS; i++) 
-        poison.push({position: createVector(
-            random(CANVAS_WIDTH),
-            random(CANVAS_HEIGHT)
-        )});
+	for (let i = 0; i < POP_SIZE; i++) 
+		population.push(new Specimen());
 
-    setInterval( _ => {
-        food.push({position: createVector(
-            random(CANVAS_WIDTH),
-            random(CANVAS_HEIGHT)
-        )});
-    }, 1000);
-    setInterval( _ => {
-        poison.push({position: createVector(
-            random(CANVAS_WIDTH),
-            random(CANVAS_HEIGHT)
-        )});
-    }, 5000);
+	for (let i = 0; i < INITIAL_FOODS; i++)
+		food.push({
+			position: createVector(
+				random(CANVAS_WIDTH), 
+				random(CANVAS_HEIGHT)
+			),
+			radius: 4
+		});
+
+	for (let i = 0; i < INITIAL_POISONS; i++)
+		poison.push({
+			position: createVector(
+				random(CANVAS_WIDTH), 
+				random(CANVAS_HEIGHT)
+			),
+			radius: 4
+		});
+	
+	// Cria uma comida nova a cada intervalo
+	setInterval(_ => {
+		food.push({
+			position: createVector(
+				random(CANVAS_WIDTH), 
+				random(CANVAS_HEIGHT)
+			),
+			radius: 4
+		});
+	}, 1000);
+
+	// Cria um veneno novo a cada intervalo
+	setInterval(_ => {
+		poison.push({
+			position: createVector(
+				random(CANVAS_WIDTH), 
+				random(CANVAS_HEIGHT)
+			),
+			radius: 4
+		});
+	}, 5000);
+
+	// Diminui o raio de todos 
+	setInterval(_ => {
+		for (let coiso of population) {
+			if (coiso.radius < 4)
+				coiso.die();
+
+			coiso.radius -= 0.5;
+			coiso.fitness += 1;
+		}
+	}, 1000);
 }
 
-function draw() {     
-    background(0);
+function draw() {
+	background(0);
 
-    for(let i of food) {
-        fill(0, 255, 0);
-        noStroke();
-        circle(i.position.x, i.position.y, 8);
-    }
+	for (let i of food) {
+		fill(0, 255, 0);
+		noStroke();
+		circle(i.position.x, i.position.y, 2 * i.radius);
+	}
 
-    for(let j of poison) {
-        fill(255, 0, 0);
-        noStroke();
-        circle(j.position.x, j.position.y, 8);
-    }
+	for (let j of poison) {
+		fill(255, 0, 0);
+		noStroke();
+		circle(j.position.x, j.position.y, 2 * j.radius);
+	}
 
-    for(let coiso of population) {
-        coiso.draw();
-        coiso.move();
-        
-        coiso.behavior();
-        // coiso.seekFood();
-        // coiso.seekPoison();
-        // coiso.seekEnemy();      
-    }
+	for (let coiso of population) {
+		coiso.draw();
+		coiso.move();
+		coiso.behavior();
+	}
 }
