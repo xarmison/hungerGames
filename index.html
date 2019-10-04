@@ -33,6 +33,11 @@
         <script
             language="javascript"
             type="text/javascript"
+            src="Population.js"
+        ></script>
+        <script
+            language="javascript"
+            type="text/javascript"
             src="main.js"
         ></script>
         
@@ -43,18 +48,30 @@
                 background-color: #ebe3e3;
             }
 
-            #canvasDiv {
+            .center {
                 position: absolute;
                 left: 50%;
                 top: 50%;
                 transform: translate(-50%, -50%);
             }
+
+            .centerX {
+                margin-top: 12px;
+                margin-left: 400px;
+            }
         </style>
 
     <body>
-
         <div class="container">
-                <div id="canvasDiv"></div>
+                <div id="title" class="centerX">
+                    <h1>Hunger Games</h1>
+                </div>
+
+                <div id="canvasDiv" class="center"></div>
+
+                <div class="centerX">
+                    <h1>Generation: </h1>
+                </div>
         </div>
         
     </body>
