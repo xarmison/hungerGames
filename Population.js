@@ -1,11 +1,11 @@
 class Population {
-    constructor() {
+    constructor(mRate, popSize) {
         this.generation = 0;
 
-        this.mutationRate = 0.01;
+        this.mutationRate = mRate;
 
         this.population = [];
-        for (let i = 0; i < POP_SIZE; i++) 
+        for (let i = 0; i < popSize; i++) 
 		    this.population.push(new Specimen());
         
         this.dead = [];
@@ -16,12 +16,16 @@ class Population {
     naturalSelection() {
         let maxFitness = this.dead[this.dead.length - 1].fitness;
 
+        this.matingPool = [];
+
         for (let i of this.dead) {
             let fitness = map(i.fitness, 0, maxFitness, 0, 1);
 
             for (let j = 0; j < floor(fitness * 10); j++) 
                 this.matingPool.push(i);
         }
+        
+        this.dead = [];
     }
 
     generate() {
@@ -43,11 +47,12 @@ class Population {
     }
 
     genocide() {
-        // Coloca o melhor no fim do array        
+        // Coloca o melhor no fim do array   (NOT HAPPENING)     
         this.population.sort((a, b) => a.fitness > b.fitness);
         
-        for (let i of this.population) 
-            this.dead.push(i)
+        while(this.population.length != 0){
+            this.population[0].die();
+        }
         
         this.population = [];        
     }

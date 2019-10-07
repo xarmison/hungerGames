@@ -1,5 +1,7 @@
-const CANVAS_WIDTH = 1200, CANVAS_HEIGHT = 550;
-const POP_SIZE = 10, INITIAL_FOODS = 50, INITIAL_POISONS = 5;
+let CANVAS_WIDTH = 1200, CANVAS_HEIGHT = 550;
+const windowOffset = 300;
+const POP_SIZE = 50, INITIAL_FOODS = 50, INITIAL_POISONS = 5;
+const MUTATION_RATE = 0, GENOCIDE_TIME = 10;
 
 let food = [], poison = [];
 
@@ -11,10 +13,12 @@ function isInsideCircle(point, pos, radius) {
 
 function setup() {
 	frameRate(60);
+	CANVAS_WIDTH = windowWidth - windowOffset;
+	CANVAS_HEIGHT = windowHeight - windowOffset;
 	let canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 	canvas.parent("canvasDiv");
 
-	individuals = new Population();
+	individuals = new Population(MUTATION_RATE, POP_SIZE);
 
 	background(0);
 
@@ -45,7 +49,7 @@ function setup() {
 			),
 			radius: 4
 		});
-	}, 500);
+	}, 250);
 
 	// Cria um veneno novo a cada intervalo
 	setInterval(_ => {
@@ -64,13 +68,13 @@ function setup() {
 			if (coiso.radius < 4)
 				coiso.die();
 	
-			coiso.radius -= 0.05;
-			coiso.fitness += 1 + coiso.radius;
+			coiso.radius -= 0.5;
+			coiso.fitness += 1;
 		}
 	}, 1000);
 
 	// Genocidio
-	setInterval(_ => individuals.genocide(), 30000);
+	setInterval(_ => individuals.genocide(), GENOCIDE_TIME*1000);
 }
 
 function draw() {
@@ -122,4 +126,10 @@ function draw() {
 				radius: 4
 			})
 	}	
+}
+
+function windowResized() {
+	CANVAS_WIDTH = windowWidth - windowOffset;
+	CANVAS_HEIGHT = windowHeight - windowOffset;
+	resizeCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 }

@@ -19,7 +19,7 @@ class Specimen {
 			poisonWeight: random(-1, 1),
 			enemyWeight: random(-1, 1),
 			accelerationWeight: random(0.5, 1),
-			visionWeight: random(1, 2)
+			visionWeight: random(1, 3)
 		};
 
 		this.visionRadius = 3 * this.radius * this.dna.visionWeight;
@@ -129,15 +129,17 @@ class Specimen {
 
 				// Incrementa a área proporcionalmente a área do target
 				let increment = sqrt(pow(closest.radius, 2) + pow(this.radius, 2)) - this.radius;				
-				this.radius += nutritionValue * increment;
+				this.radius += 2 * nutritionValue * increment;
 				
 				// Limita superiormente o raio de visão
 				this.visionRadius += 1.2 * nutritionValue * increment;
 				this.visionRadius = this.visionRadius > 500 ? 500 : this.visionRadius;
 
 				// Diminui a velocidade
-				if (this.maxSpeed > 0.5)
-					this.maxSpeed -= 0.01 * nutritionValue * increment;
+				if (this.maxSpeed > 0.1)
+					this.maxSpeed -= 0.5 * nutritionValue * increment;
+				else
+					this.maxSpeed = 0.1;
 			} else {
 				this.die();	
 			}
@@ -149,8 +151,14 @@ class Specimen {
 			return createVector(0, 0);
 	}
 
+	// Remove da população
 	die() {
-		// Remove da população quando for muito pequeno e tentar comer veneno
+		this.fitness += 1 + this.radius;
+		
+		// Condição arbitrária
+		if (this.fitness <= 11)
+			this.fitness = 0;
+
 		individuals.dead.push(this);
 		individuals.population.splice(individuals.population.indexOf(this), 1);
 	}
@@ -199,28 +207,44 @@ class Specimen {
 			}
 		}
 
-		if (closest) 
-			return this.seek(closest.position);
+		if (closest){
+			if (closest.radius < this.radius) 
+				return this.seek(closest.position);
+			else
+				return this.seek(closest.position).mult(-1);
+		}
 		else 
 			return createVector(0, 0); 
 	}
 
 	// Muda aleatoriamente uma caracteristica
 	mutate(mutationRate) {
-		if (random(1) < mutationRate) 
+		let mutou = 0;
+		if (random(1) < mutationRate){
 			this.dna.accelerationWeight = random(0.5, 1);
+			mutou++;
+		}
 
-		if (random(1) < mutationRate) 
+		if (random(1) < mutationRate){
 			this.dna.enemyWeight = random(-1, 1);
+			mutou++;
+		}
 		
-		if (random(1) < mutationRate) 
+		if (random(1) < mutationRate){ 
 			this.dna.poisonWeight = random(-1, 1);
+			mutou++;
+		}
 		
-		if (random(1) < mutationRate) 
+		if (random(1) < mutationRate){ 
 			this.dna.foodWeight = random(-1, 1);
-
-		if (random(1) < mutationRate) 
+			mutou++;
+		}
+		
+		if (random(1) < mutationRate){ 
 			this.dna.visionWeight = random(1, 2);
+			mutou++;
+		}
+		console.log(mutou);
 		
 		// Atualiza a cor
 		if (this.dna.foodWeight > this.dna.poisonWeight && this.dna.foodWeight > this.dna.enemyWeight)
