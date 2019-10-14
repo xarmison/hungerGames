@@ -1,7 +1,7 @@
 let CANVAS_WIDTH = 1200, CANVAS_HEIGHT = 550;
 const windowOffset = 300;
-const POP_SIZE = 50, INITIAL_FOODS = 50, INITIAL_POISONS = 5;
-const MUTATION_RATE = 0, GENOCIDE_TIME = 10;
+const POP_SIZE = 10, INITIAL_FOODS = 50, INITIAL_POISONS = 25;
+const MUTATION_RATE = 0.1, GENOCIDE_TIME = 15;
 
 let food = [], poison = [];
 

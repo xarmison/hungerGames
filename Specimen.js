@@ -244,7 +244,7 @@ class Specimen {
 			this.dna.visionWeight = random(1, 2);
 			mutou++;
 		}
-		console.log(mutou);
+		if(mutou) console.log("mutou");
 		
 		// Atualiza a cor
 		if (this.dna.foodWeight > this.dna.poisonWeight && this.dna.foodWeight > this.dna.enemyWeight)

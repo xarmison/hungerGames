@@ -18,12 +18,18 @@ class Population {
 
         this.matingPool = [];
 
+        let meanFitness = 0;
+
         for (let i of this.dead) {
             let fitness = map(i.fitness, 0, maxFitness, 0, 1);
+            meanFitness += i.fitness;
 
             for (let j = 0; j < floor(fitness * 10); j++) 
                 this.matingPool.push(i);
         }
+        
+        console.log((meanFitness/this.dead.length).toFixed(3));
+        console.log(maxFitness.toFixed(3));
         
         this.dead = [];
     }
