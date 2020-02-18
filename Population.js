@@ -28,8 +28,8 @@ class Population {
                 this.matingPool.push(i);
         }
         
-        console.log((meanFitness/this.dead.length).toFixed(3));
-        console.log(maxFitness.toFixed(3));
+        console.log(`Fitness médio: ${(meanFitness/this.dead.length).toFixed(3)}`);
+        console.log(`Fitness máximo: ${maxFitness.toFixed(3)}`);
         
         this.dead = [];
     }
